@@ -4,13 +4,13 @@ import { expect, test } from "@playwright/test";
 const require = createRequire(import.meta.url);
 const axePath = require.resolve("axe-core/axe.min.js");
 const routes = [
-  ["home", "/#/", "Pacific network"],
-  ["compare", "/#/about", "Live milestones"],
-  ["shipments", "/#/data-table", "NA-82041"],
-  ["reports", "/#/dashboard", "Transpacific eastbound"],
+  ["home", "/#/", "Pacific network", 3],
+  ["compare", "/#/about", "Live milestones", 1],
+  ["shipments", "/#/data-table", "NA-82041", 0],
+  ["reports", "/#/dashboard", "Transpacific eastbound", 1],
 ] as const;
 
-for (const [name, path, expectedContent] of routes) {
+for (const [name, path, expectedContent, expectedImageCount] of routes) {
   test(`${name} route is responsive and WCAG AA clean`, async ({ page }, testInfo) => {
     const runtimeErrors: string[] = [];
     page.on("pageerror", (error) => runtimeErrors.push(error.message));
@@ -22,6 +22,17 @@ for (const [name, path, expectedContent] of routes) {
     expect(viewportWidth).toBe(testInfo.project.name === "mobile" ? 412 : 1440);
     await expect(page.locator("h1").first()).toBeVisible();
     await expect(page.getByText(expectedContent, { exact: false }).first()).toBeVisible();
+    const images = page.locator("main img");
+    await expect(images).toHaveCount(expectedImageCount);
+    for (let index = 0; index < expectedImageCount; index += 1) {
+      await images.nth(index).scrollIntoViewIfNeeded();
+      await expect.poll(() => images.nth(index).evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+    }
+    const invalidImages = await images.evaluateAll((nodes) => nodes.filter((node) => {
+      const image = node as HTMLImageElement;
+      return !image.src.includes("/images/") || !image.alt.trim() || image.naturalWidth === 0;
+    }).map((node) => (node as HTMLImageElement).src));
+    expect(invalidImages).toEqual([]);
     const overflow = await page.evaluate(() => ({
       amount: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       elements: [...document.querySelectorAll("*")].filter((element) => element.getBoundingClientRect().right > document.documentElement.clientWidth + 1).slice(0, 8).map((element) => `${element.tagName.toLowerCase()}.${element.className}`),

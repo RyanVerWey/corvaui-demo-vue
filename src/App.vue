@@ -129,7 +129,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
             </div>
           </div>
           <figure class="hero-image">
-            <img src="https://images.unsplash.com/photo-1494412519320-aa613dfb7738?auto=format&fit=crop&w=1500&q=84" alt="Container vessel and cranes working at a coastal freight terminal" />
+            <img src="/images/northline-terminal.jpg" alt="Container vessel and cranes working at a coastal freight terminal" width="1800" height="1200" fetchpriority="high" />
             <figcaption>
               <span>Pacific network</span>
               <strong>16 exceptions resolved before cut-off</strong>
@@ -151,11 +151,15 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
         </section>
 
         <section class="network-story" aria-labelledby="network-title">
-          <div class="route-visual" aria-label="Illustrated freight route from Oakland to Rotterdam">
-            <span class="route-point point-a">Oakland</span>
-            <span class="route-point point-b">Panama</span>
-            <span class="route-point point-c">Rotterdam</span>
-            <div class="route-line"></div>
+          <div class="operations-mosaic" aria-label="Northline intermodal operations">
+            <figure class="operations-primary">
+              <img src="/images/northline-port.jpg" alt="Port, rail yard, and highway operating as one intermodal terminal" width="1600" height="900" loading="lazy" />
+              <figcaption><span>Terminal 04</span><strong>Ocean, road, and rail in one operating view</strong></figcaption>
+            </figure>
+            <figure class="operations-secondary">
+              <img src="/images/northline-rail.jpg" alt="Gantry crane moving containers above an intermodal freight train" width="1600" height="1200" loading="lazy" />
+              <figcaption>18:40 rail cut-off protected</figcaption>
+            </figure>
           </div>
           <CorvaStack gap="md">
             <CorvaBadge tone="info">Live corridor</CorvaBadge>
@@ -179,7 +183,10 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
             <CorvaTypography as="h1" variant="display">Choose the control layer your network needs.</CorvaTypography>
             <CorvaTypography variant="body">From visibility to managed intervention, every tier uses the same decision model and customer-ready record.</CorvaTypography>
           </div>
-          <CorvaCard eyebrow="Network standard" heading="One source of route truth">Every plan includes live milestone history, role-based handoffs, and exportable customer evidence.</CorvaCard>
+          <figure class="page-photo">
+            <img src="/images/northline-port.jpg" alt="Coastal port connected to highway and rail infrastructure" width="1600" height="900" loading="lazy" />
+            <figcaption><span>Network standard</span><strong>One source of route truth across every handoff.</strong></figcaption>
+          </figure>
         </header>
 
         <section class="content-section" aria-labelledby="service-title">
@@ -256,6 +263,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
             <CorvaDataTable caption="Priority lane report" :columns="dashboardColumns" :rows="dashboardRows"></CorvaDataTable>
           </div>
           <CorvaStack gap="md">
+            <figure class="report-photo"><img src="/images/northline-rail.jpg" alt="Intermodal containers moving through a rail terminal at dusk" width="1600" height="1200" loading="lazy" /></figure>
             <CorvaCard eyebrow="Recommended action" heading="Pull Chicago rail forward">Capacity remains available today. Moving 11 containers now protects the Friday transload window.</CorvaCard>
             <CorvaProgress label="Team response within SLA" :value="89"></CorvaProgress>
             <CorvaAlert tone="warning" heading="Two decisions due">Pacific Northwest reefer and Houston import dray need owners before 16:00 UTC.</CorvaAlert>
