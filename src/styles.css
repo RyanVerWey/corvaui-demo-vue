@@ -1,5 +1,5 @@
 :root {
-  font-family: var(--apex-font-family-sans);
+  font-family: var(--corva-font-family-sans);
 }
 
 * {
@@ -14,30 +14,30 @@ body {
   margin: 0;
   min-width: 0;
   overflow-x: hidden;
-  background: var(--apex-color-canvas, var(--apex-color-background));
-  color: var(--apex-color-text, var(--apex-color-foreground));
+  background: var(--corva-color-canvas, var(--corva-color-background));
+  color: var(--corva-color-text, var(--corva-color-foreground));
 }
 
 .app-shell {
   min-height: 100vh;
-  background: var(--apex-color-canvas, var(--apex-color-background));
+  background: var(--corva-color-canvas, var(--corva-color-background));
 }
 
 .app-main {
-  padding: var(--apex-space-6, 24px);
+  padding: var(--corva-space-6, 24px);
 }
 
 .app-layout {
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-  gap: var(--apex-space-6, 24px);
+  gap: var(--corva-space-6, 24px);
   align-items: start;
 }
 
 .app-page {
   display: grid;
   min-width: 0;
-  gap: var(--apex-space-6, 24px);
+  gap: var(--corva-space-6, 24px);
 }
 
 .hero-layout,
@@ -46,14 +46,18 @@ body {
 .settings-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: var(--apex-space-5, 20px);
+  gap: var(--corva-space-5, 20px);
   align-items: start;
+}
+
+.wide-left {
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
 }
 
 .page-head {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--apex-space-4, 16px);
+  gap: var(--corva-space-4, 16px);
   align-items: start;
   justify-content: space-between;
 }
@@ -63,7 +67,7 @@ body {
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--apex-space-5, 20px);
+  gap: var(--corva-space-5, 20px);
 }
 
 .chart-grid {
@@ -73,7 +77,7 @@ body {
 .field-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--apex-space-4, 16px);
+  gap: var(--corva-space-4, 16px);
 }
 
 .action-row,
@@ -81,33 +85,33 @@ body {
 .visual-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--apex-space-3, 12px);
+  gap: var(--corva-space-3, 12px);
   align-items: center;
 }
 
 .hero-visual {
   display: grid;
-  gap: var(--apex-space-4, 16px);
+  gap: var(--corva-space-4, 16px);
   min-width: 0;
-  padding: var(--apex-space-5, 20px);
-  border: 1px solid var(--apex-color-border, currentColor);
-  border-radius: var(--apex-radius-lg, 16px);
-  background: var(--apex-color-surface, transparent);
+  padding: var(--corva-space-5, 20px);
+  border: 1px solid var(--corva-color-border, currentColor);
+  border-radius: var(--corva-radius-lg, 16px);
+  background: var(--corva-color-surface, transparent);
 }
 
 .hero-visual span {
-  font-weight: var(--apex-font-weight-semibold, 700);
+  font-weight: var(--corva-font-weight-semibold, 700);
 }
 
-.app-page apex-paper,
-.app-page apex-card,
-.app-page apex-data-table,
-.app-page apex-data-grid,
-.app-page apex-chart,
-.app-page apex-workflow-board,
-.app-page apex-file-upload,
-.app-page apex-list,
-.app-page apex-alert {
+.app-page corva-paper,
+.app-page corva-card,
+.app-page corva-data-table,
+.app-page corva-data-grid,
+.app-page corva-chart,
+.app-page corva-workflow-board,
+.app-page corva-file-upload,
+.app-page corva-list,
+.app-page corva-alert {
   min-width: 0;
 }
 
@@ -120,7 +124,7 @@ body {
 
 @media (max-width: 960px) {
   .app-main {
-    padding: var(--apex-space-4, 16px);
+    padding: var(--corva-space-4, 16px);
   }
 
   .app-layout,
@@ -136,7 +140,7 @@ body {
 
 @media (max-width: 680px) {
   .app-main {
-    padding: var(--apex-space-3, 12px);
+    padding: var(--corva-space-3, 12px);
   }
 
   .proof-grid,

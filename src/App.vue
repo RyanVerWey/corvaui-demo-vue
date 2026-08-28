@@ -1,45 +1,45 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
 import {
-  ApexAccordion,
-  ApexAlert,
-  ApexAppBar,
-  ApexAutocomplete,
-  ApexAvatar,
-  ApexBadge,
-  ApexButton,
-  ApexButtonGroup,
-  ApexCard,
-  ApexChart,
-  ApexCheckbox,
-  ApexChip,
-  ApexDataGrid,
-  ApexDataTable,
-  ApexDatePicker,
-  ApexFileUpload,
-  ApexIcon,
-  ApexList,
-  ApexNumberField,
-  ApexPaper,
-  ApexProgress,
-  ApexRadioGroup,
-  ApexSearchForm,
-  ApexSelect,
-  ApexSidebar,
-  ApexStack,
-  ApexStepper,
-  ApexSwitch,
-  ApexTabs,
-  ApexTextarea,
-  ApexTextField,
-  ApexTimeline,
-  ApexToolbar,
-  ApexTypography,
-  ApexWorkflowBoard,
-} from "@apexui/vue";
+  CorvaAccordion,
+  CorvaAlert,
+  CorvaAppBar,
+  CorvaAutocomplete,
+  CorvaAvatar,
+  CorvaBadge,
+  CorvaButton,
+  CorvaButtonGroup,
+  CorvaCard,
+  CorvaChart,
+  CorvaCheckbox,
+  CorvaChip,
+  CorvaDataGrid,
+  CorvaDataTable,
+  CorvaDatePicker,
+  CorvaFileUpload,
+  CorvaIcon,
+  CorvaList,
+  CorvaNumberField,
+  CorvaPaper,
+  CorvaProgress,
+  CorvaRadioGroup,
+  CorvaSearchForm,
+  CorvaSelect,
+  CorvaSidebar,
+  CorvaStack,
+  CorvaStepper,
+  CorvaSwitch,
+  CorvaTabs,
+  CorvaTextarea,
+  CorvaTextField,
+  CorvaTimeline,
+  CorvaToolbar,
+  CorvaTypography,
+  CorvaWorkflowBoard,
+} from "@corvaui/vue";
 
 type Mode = "light" | "dark";
-type RouteId = "home" | "dashboard" | "work-orders" | "customers" | "settings" | "about";
+type RouteId = "home" | "dashboard" | "work-orders" | "customers" | "data-table" | "settings" | "about";
 type WorkOrderKey = "site" | "contact" | "city" | "date" | "crew" | "priority" | "budget" | "notes";
 
 const routes: Array<{ id: RouteId; path: string; label: string; badge?: string }> = [
@@ -47,6 +47,7 @@ const routes: Array<{ id: RouteId; path: string; label: string; badge?: string }
   { id: "dashboard", path: "/dashboard", label: "Metrics", badge: "live" },
   { id: "work-orders", path: "/work-orders", label: "Work orders" },
   { id: "customers", path: "/customers", label: "Customers", badge: "12" },
+  { id: "data-table", path: "/data-table", label: "Data table" },
   { id: "settings", path: "/settings", label: "Settings" },
   { id: "about", path: "/about", label: "Package proof" },
 ];
@@ -74,11 +75,11 @@ const workOrder = reactive<Record<WorkOrderKey, string>>({
   notes: "Replace rooftop controller, inspect line sensors, and stage customer approval before 15:00.",
 });
 
-const themeName = computed(() => `gilded-${mode.value}`);
+const themeName = computed(() => `ocean-${mode.value}`);
 const currentRoute = computed(() => routeLookup.get(currentPath.value) ?? routes[0]);
 const shellTitle = computed(() => {
-  if (currentRoute.value.id === "home") return "Northstar Field Services";
-  return `${currentRoute.value.label} | Northstar Field Services`;
+  if (currentRoute.value.id === "home") return "CorvaUI Field Services";
+  return `${currentRoute.value.label} | CorvaUI Field Services`;
 });
 const routeSidebarItems = computed(() =>
   routes.map((route) => ({
@@ -192,10 +193,27 @@ const pipelineColumns = [
   { key: "value", header: "Value" },
   { key: "next", header: "Next step" },
 ];
+const serviceRecordRows = [
+  { id: "SR-1028", account: "Granite Health", region: "Northeast", owner: "Maya Chen", priority: "High", status: "Scheduled", window: "09:00-11:00" },
+  { id: "SR-1029", account: "Cobalt Hospitality", region: "Harbor", owner: "Omar Haddad", priority: "Critical", status: "Parts hold", window: "11:30-14:00" },
+  { id: "SR-1030", account: "StateLine Logistics", region: "Inland", owner: "Elena Rossi", priority: "Normal", status: "On route", window: "13:00-15:00" },
+  { id: "SR-1031", account: "North Pier Arena", region: "Downtown", owner: "Nia Brooks", priority: "High", status: "Approval", window: "15:00-17:00" },
+  { id: "SR-1032", account: "Harbor Foods", region: "Harbor", owner: "Maya Chen", priority: "Normal", status: "Closed", window: "08:00-10:00" },
+  { id: "SR-1033", account: "Summit Bank", region: "West", owner: "Omar Haddad", priority: "Critical", status: "Triage", window: "10:30-12:30" },
+];
+const serviceRecordColumns = [
+  { key: "id", header: "Record", sortable: true, filterable: true },
+  { key: "account", header: "Account", sortable: true, filterable: true },
+  { key: "region", header: "Region", sortable: true, filterable: true },
+  { key: "owner", header: "Owner", sortable: true, filterable: true },
+  { key: "priority", header: "Priority", sortable: true, filterable: true },
+  { key: "status", header: "Status", sortable: true, filterable: true },
+  { key: "window", header: "Window", sortable: true, filterable: true },
+];
 const packageRows = [
-  { package: "@apexui/vue", role: "Vue 3 wrappers", proof: "All page controls import from package" },
-  { package: "@apexui/tokens", role: "Gilded themes", proof: "Shell uses data-apex-theme" },
-  { package: "Vite", role: "Build host", proof: "Hash routes work on GitHub Pages" },
+  { package: "@corvaui/vue", role: "Vue 3 wrappers", proof: "All page controls import from package" },
+  { package: "@corvaui/tokens", role: "Ocean themes", proof: "Shell uses data-corva-theme" },
+  { package: "Vite", role: "Build host", proof: "Hash routes work on Vercel" },
 ];
 const packageColumns = [
   { key: "package", header: "Package" },
@@ -242,271 +260,316 @@ const uploadedFiles = [
   { name: "customer-scope.pdf", meta: "188 KB" },
 ];
 const proofItems = [
-  { id: "routing", heading: "Hash routing", content: "Six business pages share Vue state and work on static GitHub Pages hosting." },
-  { id: "tokens", heading: "Gilded tokens", content: "The app shell switches between gilded-light and gilded-dark token scopes." },
-  { id: "components", heading: "ApexUI controls", content: "Forms, charts, tables, navigation, tabs, workflow, and feedback use @apexui/vue." },
+  { id: "routing", heading: "Hash routing", content: "Seven business pages share Vue state and work on Vercel hosting." },
+  { id: "tokens", heading: "Ocean tokens", content: "The app shell switches between ocean-light and ocean-dark token scopes." },
+  { id: "components", heading: "CorvaUI controls", content: "Forms, charts, tables, navigation, tabs, workflow, and feedback use @corvaui/vue." },
 ];
 </script>
 
 <template>
-  <main class="app-shell" :data-apex-theme="themeName">
-    <ApexAppBar :heading="shellTitle">
-      <ApexButtonGroup slot="actions" label="Theme mode">
-        <ApexButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">Light</ApexButton>
-        <ApexButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">Dark</ApexButton>
-      </ApexButtonGroup>
-    </ApexAppBar>
+  <main class="app-shell" :data-corva-theme="themeName">
+    <CorvaAppBar :heading="shellTitle">
+      <CorvaButtonGroup slot="actions" label="Theme mode">
+        <CorvaButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">Light</CorvaButton>
+        <CorvaButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">Dark</CorvaButton>
+      </CorvaButtonGroup>
+    </CorvaAppBar>
 
     <div class="app-main">
       <div class="app-layout">
-        <ApexSidebar
-          heading="Northstar"
+        <CorvaSidebar
+          heading="CorvaUI"
           label="Business routes"
           :active-id="currentRoute.id"
           :items="routeSidebarItems"
-          @apexSelect="navigateById"
+          @corvaSelect="navigateById"
         >
-          <ApexBadge slot="footer" tone="info">{{ themeName }}</ApexBadge>
-        </ApexSidebar>
+          <CorvaBadge slot="footer" tone="info">{{ themeName }}</CorvaBadge>
+        </CorvaSidebar>
 
         <section class="app-page" :aria-label="currentRoute.label">
           <template v-if="currentRoute.id === 'home'">
-            <ApexPaper>
+            <CorvaPaper>
               <div class="hero-layout">
-                <ApexStack gap="md">
-                  <ApexBadge tone="info">Regional field operations</ApexBadge>
-                  <ApexTypography as="h1" variant="display">Northstar keeps service teams on time, stocked, and accountable.</ApexTypography>
-                  <ApexTypography variant="body">
+                <CorvaStack gap="md">
+                  <CorvaBadge tone="info">Regional field operations</CorvaBadge>
+                  <CorvaTypography as="h1" variant="display">CorvaUI keeps service teams on time, stocked, and accountable.</CorvaTypography>
+                  <CorvaTypography variant="body">
                     Premium dispatch software for HVAC, facilities, and field maintenance teams that need clean schedules,
                     signed work, and leadership metrics in one operating system.
-                  </ApexTypography>
-                  <ApexSearchForm label="Find a service plan" placeholder="Search contracts, sites, service lines"></ApexSearchForm>
+                  </CorvaTypography>
+                  <CorvaSearchForm label="Find a service plan" placeholder="Search contracts, sites, service lines"></CorvaSearchForm>
                   <div class="action-row">
-                    <ApexButton @click="navigate('/work-orders')">Create work order</ApexButton>
-                    <ApexButton variant="secondary" @click="navigate('/dashboard')">View live metrics</ApexButton>
+                    <CorvaButton @click="navigate('/work-orders')">Create work order</CorvaButton>
+                    <CorvaButton variant="secondary" @click="navigate('/dashboard')">View live metrics</CorvaButton>
                   </div>
-                </ApexStack>
+                </CorvaStack>
 
-                <div class="hero-visual" aria-label="Northstar daily operations proof">
+                <div class="hero-visual" aria-label="CorvaUI daily operations proof">
                   <div class="visual-row">
-                    <ApexIcon name="route" size="lg" decorative></ApexIcon>
+                    <CorvaIcon name="route" size="lg" decorative></CorvaIcon>
                     <span>37 crews routed</span>
                   </div>
-                  <ApexProgress label="SLA confidence" :value="91"></ApexProgress>
-                  <ApexProgress label="Parts readiness" :value="84"></ApexProgress>
-                  <ApexProgress label="Customer signoff" :value="78"></ApexProgress>
+                  <CorvaProgress label="SLA confidence" :value="91"></CorvaProgress>
+                  <CorvaProgress label="Parts readiness" :value="84"></CorvaProgress>
+                  <CorvaProgress label="Customer signoff" :value="78"></CorvaProgress>
                 </div>
               </div>
-            </ApexPaper>
+            </CorvaPaper>
 
             <div class="proof-grid">
-              <ApexCard eyebrow="Offer" heading="Dispatch command">
+              <CorvaCard eyebrow="Offer" heading="Dispatch command">
                 Route planning, service history, and schedule risk stay visible before crews roll.
-              </ApexCard>
-              <ApexCard eyebrow="Customer proof" heading="14 minute faster closeout">
+              </CorvaCard>
+              <CorvaCard eyebrow="Customer proof" heading="14 minute faster closeout">
                 Regional operators cut paperwork lag by moving approvals and evidence capture into the same flow.
-              </ApexCard>
-              <ApexCard eyebrow="Field ready" heading="No training deck required">
-                Clean ApexUI controls make technician, dispatcher, and account workflows feel consistent.
-              </ApexCard>
+              </CorvaCard>
+              <CorvaCard eyebrow="Field ready" heading="No training deck required">
+                Clean CorvaUI controls make technician, dispatcher, and account workflows feel consistent.
+              </CorvaCard>
             </div>
 
-            <ApexToolbar label="Launch desk">
-              <ApexButton size="sm" @click="navigate('/customers')">Open pipeline</ApexButton>
-              <ApexButton size="sm" variant="secondary" @click="navigate('/about')">Package proof</ApexButton>
-            </ApexToolbar>
+            <CorvaToolbar label="Launch desk">
+              <CorvaButton size="sm" @click="navigate('/customers')">Open pipeline</CorvaButton>
+              <CorvaButton size="sm" variant="secondary" @click="navigate('/about')">Package proof</CorvaButton>
+            </CorvaToolbar>
           </template>
 
           <template v-else-if="currentRoute.id === 'dashboard'">
             <div class="page-head">
-              <ApexStack gap="sm">
-                <ApexBadge tone="success">Operations live</ApexBadge>
-                <ApexTypography as="h1" variant="title">Metrics dashboard</ApexTypography>
-                <ApexTypography variant="body">Dispatch health, route load, and revenue mix for today.</ApexTypography>
-              </ApexStack>
-              <ApexButton variant="secondary" @click="navigate('/work-orders')">Add order</ApexButton>
+              <CorvaStack gap="sm">
+                <CorvaBadge tone="success">Operations live</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">Metrics dashboard</CorvaTypography>
+                <CorvaTypography variant="body">Dispatch health, route load, and revenue mix for today.</CorvaTypography>
+              </CorvaStack>
+              <CorvaButton variant="secondary" @click="navigate('/work-orders')">Add order</CorvaButton>
             </div>
 
             <div class="stat-grid">
-              <ApexCard eyebrow="Today" heading="142 visits">31 emergency, 86 preventive, 25 quoted follow-ups.</ApexCard>
-              <ApexCard eyebrow="SLA" heading="96.4 percent">Only Harbor Corridor needs dispatcher review.</ApexCard>
-              <ApexCard eyebrow="Revenue" heading="$418K">Install work leads booked value this week.</ApexCard>
+              <CorvaCard eyebrow="Today" heading="142 visits">31 emergency, 86 preventive, 25 quoted follow-ups.</CorvaCard>
+              <CorvaCard eyebrow="SLA" heading="96.4 percent">Only Harbor Corridor needs dispatcher review.</CorvaCard>
+              <CorvaCard eyebrow="Revenue" heading="$418K">Install work leads booked value this week.</CorvaCard>
             </div>
 
             <div class="chart-grid">
-              <ApexChart label="Service performance" :data="performanceChart"></ApexChart>
-              <ApexChart label="Revenue mix" :data="revenueChart"></ApexChart>
+              <CorvaChart label="Service performance" :data="performanceChart"></CorvaChart>
+              <CorvaChart label="Revenue mix" :data="revenueChart"></CorvaChart>
             </div>
 
             <div class="split-layout">
-              <ApexDataTable caption="Route load" :columns="dashboardColumns" :rows="dashboardRows"></ApexDataTable>
-              <ApexStack gap="md">
-                <ApexWorkflowBoard :columns="workflowColumns"></ApexWorkflowBoard>
-                <ApexTimeline :events="timelineEvents"></ApexTimeline>
-              </ApexStack>
+              <CorvaDataTable caption="Route load" :columns="dashboardColumns" :rows="dashboardRows"></CorvaDataTable>
+              <CorvaStack gap="md">
+                <CorvaWorkflowBoard :columns="workflowColumns"></CorvaWorkflowBoard>
+                <CorvaTimeline :events="timelineEvents"></CorvaTimeline>
+              </CorvaStack>
             </div>
           </template>
 
           <template v-else-if="currentRoute.id === 'work-orders'">
             <div class="page-head">
-              <ApexStack gap="sm">
-                <ApexBadge :tone="workOrderReady ? 'success' : 'warning'">{{ workOrderStatus }}</ApexBadge>
-                <ApexTypography as="h1" variant="title">Work order intake</ApexTypography>
-                <ApexTypography variant="body">Capture dispatch-ready scope, customer context, schedule, files, and priority.</ApexTypography>
-              </ApexStack>
-              <ApexStepper :steps="orderSteps" :active-index="submittedWorkOrder ? 1 : 0"></ApexStepper>
+              <CorvaStack gap="sm">
+                <CorvaBadge :tone="workOrderReady ? 'success' : 'warning'">{{ workOrderStatus }}</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">Work order intake</CorvaTypography>
+                <CorvaTypography variant="body">Capture dispatch-ready scope, customer context, schedule, files, and priority.</CorvaTypography>
+              </CorvaStack>
+              <CorvaStepper :steps="orderSteps" :active-index="submittedWorkOrder ? 1 : 0"></CorvaStepper>
             </div>
 
             <div class="form-layout">
-              <ApexPaper>
-                <ApexStack gap="md">
-                  <ApexTextField
+              <CorvaPaper>
+                <CorvaStack gap="md">
+                  <CorvaTextField
                     label="Site name"
                     :value="workOrder.site"
                     placeholder="Customer site"
                     :error="submittedWorkOrder && !workOrder.site ? 'Site name is required.' : undefined"
                     @input="setFieldValue('site', $event)"
-                  ></ApexTextField>
-                  <ApexTextField
+                  ></CorvaTextField>
+                  <CorvaTextField
                     label="Site contact"
                     :value="workOrder.contact"
                     placeholder="Primary contact"
                     :error="submittedWorkOrder && !workOrder.contact ? 'Contact is required.' : undefined"
                     @input="setFieldValue('contact', $event)"
-                  ></ApexTextField>
-                  <ApexTextField label="Service city" :value="workOrder.city" placeholder="City, state" @input="setFieldValue('city', $event)"></ApexTextField>
+                  ></CorvaTextField>
+                  <CorvaTextField label="Service city" :value="workOrder.city" placeholder="City, state" @input="setFieldValue('city', $event)"></CorvaTextField>
                   <div class="field-grid">
-                    <ApexDatePicker label="Target date" :value="workOrder.date" hint="Earliest available service date"></ApexDatePicker>
-                    <ApexSelect label="Crew" :value="workOrder.crew" :options="crewOptions" @apexChange="setSelectValue('crew', $event)"></ApexSelect>
-                    <ApexSelect label="Priority" :value="workOrder.priority" :options="priorityOptions" @apexChange="setSelectValue('priority', $event)"></ApexSelect>
+                    <CorvaDatePicker label="Target date" :value="workOrder.date" hint="Earliest available service date"></CorvaDatePicker>
+                    <CorvaSelect label="Crew" :value="workOrder.crew" :options="crewOptions" @corvaChange="setSelectValue('crew', $event)"></CorvaSelect>
+                    <CorvaSelect label="Priority" :value="workOrder.priority" :options="priorityOptions" @corvaChange="setSelectValue('priority', $event)"></CorvaSelect>
                   </div>
-                  <ApexNumberField label="Estimated budget" :value="workOrder.budget" :min="0" :step="100" hint="Used for approval routing"></ApexNumberField>
-                  <ApexTextarea label="Scope notes" :value="workOrder.notes" @input="setFieldValue('notes', $event)"></ApexTextarea>
-                  <ApexFileUpload label="Attachments" description="Photos, signed scope, inspection notes" :files="uploadedFiles"></ApexFileUpload>
-                  <ApexCheckbox label="Customer approved after-hours access" checked></ApexCheckbox>
-                  <ApexRadioGroup label="Dispatch posture" name="posture" value="scheduled" :options="priorityRadioOptions"></ApexRadioGroup>
+                  <CorvaNumberField label="Estimated budget" :value="workOrder.budget" :min="0" :step="100" hint="Used for approval routing"></CorvaNumberField>
+                  <CorvaTextarea label="Scope notes" :value="workOrder.notes" @input="setFieldValue('notes', $event)"></CorvaTextarea>
+                  <CorvaFileUpload label="Attachments" description="Photos, signed scope, inspection notes" :files="uploadedFiles"></CorvaFileUpload>
+                  <CorvaCheckbox label="Customer approved after-hours access" checked></CorvaCheckbox>
+                  <CorvaRadioGroup label="Dispatch posture" name="posture" value="scheduled" :options="priorityRadioOptions"></CorvaRadioGroup>
                   <div class="action-row">
-                    <ApexButton @click="submitWorkOrder">Validate order</ApexButton>
-                    <ApexButton variant="secondary" @click="navigate('/dashboard')">Back to dashboard</ApexButton>
+                    <CorvaButton @click="submitWorkOrder">Validate order</CorvaButton>
+                    <CorvaButton variant="secondary" @click="navigate('/dashboard')">Back to dashboard</CorvaButton>
                   </div>
-                </ApexStack>
-              </ApexPaper>
+                </CorvaStack>
+              </CorvaPaper>
 
-              <ApexStack gap="md">
-                <ApexAlert :tone="workOrderReady ? 'success' : 'warning'" heading="Validation">
+              <CorvaStack gap="md">
+                <CorvaAlert :tone="workOrderReady ? 'success' : 'warning'" heading="Validation">
                   Required fields: site, contact, date, crew, and priority. Missing {{ missingWorkOrderFields.length }}.
-                </ApexAlert>
-                <ApexCard eyebrow="Dispatch preview" :heading="workOrder.site">
+                </CorvaAlert>
+                <CorvaCard eyebrow="Dispatch preview" :heading="workOrder.site">
                   {{ workOrder.contact }} in {{ workOrder.city }}. Crew {{ workOrder.crew }} with {{ workOrder.priority }} priority.
-                </ApexCard>
-                <ApexList>
+                </CorvaCard>
+                <CorvaList>
                   <li><strong>Help copy</strong><span>Use exact site names from the customer record.</span></li>
                   <li><strong>Upload policy</strong><span>Attach site photos before emergency dispatch.</span></li>
                   <li><strong>Approval</strong><span>Budgets above $25K route to finance.</span></li>
-                </ApexList>
-              </ApexStack>
+                </CorvaList>
+              </CorvaStack>
             </div>
           </template>
 
           <template v-else-if="currentRoute.id === 'customers'">
             <div class="page-head">
-              <ApexStack gap="sm">
-                <ApexBadge tone="info">Pipeline and records</ApexBadge>
-                <ApexTypography as="h1" variant="title">Customer command center</ApexTypography>
-                <ApexTypography variant="body">Account pipeline, owner coverage, and field record patterns in one page.</ApexTypography>
-              </ApexStack>
-              <ApexSearchForm label="Search customers" placeholder="Account, owner, city, stage"></ApexSearchForm>
+              <CorvaStack gap="sm">
+                <CorvaBadge tone="info">Pipeline and records</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">Customer command center</CorvaTypography>
+                <CorvaTypography variant="body">Account pipeline, owner coverage, and field record patterns in one page.</CorvaTypography>
+              </CorvaStack>
+              <CorvaSearchForm label="Search customers" placeholder="Account, owner, city, stage"></CorvaSearchForm>
             </div>
 
             <div class="split-layout">
-              <ApexDataGrid caption="Customer pipeline" :columns="pipelineColumns" :rows="pipelineRows"></ApexDataGrid>
-              <ApexPaper>
-                <ApexStack gap="md">
-                  <ApexAvatar name="Granite Health"></ApexAvatar>
-                  <ApexTypography as="h2" variant="title">Granite Health</ApexTypography>
-                  <ApexTypography variant="body">Eight campuses, 41 critical assets, renewal committee meets Friday.</ApexTypography>
+              <CorvaDataGrid caption="Customer pipeline" :columns="pipelineColumns" :rows="pipelineRows"></CorvaDataGrid>
+              <CorvaPaper>
+                <CorvaStack gap="md">
+                  <CorvaAvatar name="Granite Health"></CorvaAvatar>
+                  <CorvaTypography as="h2" variant="title">Granite Health</CorvaTypography>
+                  <CorvaTypography variant="body">Eight campuses, 41 critical assets, renewal committee meets Friday.</CorvaTypography>
                   <div class="chip-row">
-                    <ApexChip selected>Renewal</ApexChip>
-                    <ApexChip>Medical</ApexChip>
-                    <ApexChip>High SLA</ApexChip>
+                    <CorvaChip selected>Renewal</CorvaChip>
+                    <CorvaChip>Medical</CorvaChip>
+                    <CorvaChip>High SLA</CorvaChip>
                   </div>
-                  <ApexProgress label="Renewal confidence" :value="86"></ApexProgress>
-                  <ApexAutocomplete label="Account owner" value="Maya Chen" :options="ownerOptions"></ApexAutocomplete>
-                  <ApexButton @click="navigate('/work-orders')">Start service request</ApexButton>
-                </ApexStack>
-              </ApexPaper>
+                  <CorvaProgress label="Renewal confidence" :value="86"></CorvaProgress>
+                  <CorvaAutocomplete label="Account owner" value="Maya Chen" :options="ownerOptions"></CorvaAutocomplete>
+                  <CorvaButton @click="navigate('/work-orders')">Start service request</CorvaButton>
+                </CorvaStack>
+              </CorvaPaper>
             </div>
 
             <div class="proof-grid">
-              <ApexCard eyebrow="Record pattern" heading="Contract context">Contacts, sites, and assets sit beside current revenue stage.</ApexCard>
-              <ApexCard eyebrow="List pattern" heading="Next best action">Every account exposes one explicit operational next step.</ApexCard>
-              <ApexCard eyebrow="Detail pattern" heading="Proof before pitch">Progress and owner fields use real form controls, not static screenshots.</ApexCard>
+              <CorvaCard eyebrow="Record pattern" heading="Contract context">Contacts, sites, and assets sit beside current revenue stage.</CorvaCard>
+              <CorvaCard eyebrow="List pattern" heading="Next best action">Every account exposes one explicit operational next step.</CorvaCard>
+              <CorvaCard eyebrow="Detail pattern" heading="Proof before pitch">Progress and owner fields use real form controls, not static screenshots.</CorvaCard>
+            </div>
+          </template>
+
+          <template v-else-if="currentRoute.id === 'data-table'">
+            <div class="page-head">
+              <CorvaStack gap="sm">
+                <CorvaBadge tone="info">Data operations</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">Service records grid</CorvaTypography>
+                <CorvaTypography variant="body">Sortable, filterable service records prove Vue wrapper parity for dense operational tables.</CorvaTypography>
+              </CorvaStack>
+              <CorvaButtonGroup label="Grid actions">
+                <CorvaButton size="sm" variant="secondary">Export CSV</CorvaButton>
+                <CorvaButton size="sm">Save view</CorvaButton>
+              </CorvaButtonGroup>
+            </div>
+
+            <CorvaToolbar label="Data table controls">
+              <CorvaSearchForm label="Search service records" placeholder="Account, owner, region, status"></CorvaSearchForm>
+              <CorvaBadge tone="success">6 records</CorvaBadge>
+            </CorvaToolbar>
+
+            <div class="split-layout wide-left">
+              <CorvaDataGrid
+                caption="Service record queue"
+                :columns="serviceRecordColumns"
+                :rows="serviceRecordRows"
+                sortable
+                filterable
+                pageable
+                :page-size="4"
+              ></CorvaDataGrid>
+              <CorvaPaper>
+                <CorvaStack gap="md">
+                  <CorvaTypography as="h2" variant="title">Selected queue policy</CorvaTypography>
+                  <CorvaProgress label="Records with complete closeout notes" :value="84"></CorvaProgress>
+                  <CorvaAlert tone="info" heading="Wrapper behavior">
+                    Vue passes arrays as typed props to CorvaUI wrappers, so DataGrid owns sort, filter, and page state.
+                  </CorvaAlert>
+                  <CorvaList>
+                    <li><strong>Sort</strong><span>Click any enabled column header.</span></li>
+                    <li><strong>Filter</strong><span>Use column filters for scoped search.</span></li>
+                    <li><strong>Page</strong><span>Page size is set from Vue state.</span></li>
+                  </CorvaList>
+                </CorvaStack>
+              </CorvaPaper>
             </div>
           </template>
 
           <template v-else-if="currentRoute.id === 'settings'">
             <div class="page-head">
-              <ApexStack gap="sm">
-                <ApexBadge tone="info">Account controls</ApexBadge>
-                <ApexTypography as="h1" variant="title">Settings and account</ApexTypography>
-                <ApexTypography variant="body">Preferences, locale, notification posture, and theme controls for operations users.</ApexTypography>
-              </ApexStack>
-              <ApexSwitch label="Dark mode" :checked="mode === 'dark'" @apexChange="setModeFromSwitch"></ApexSwitch>
+              <CorvaStack gap="sm">
+                <CorvaBadge tone="info">Account controls</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">Settings and account</CorvaTypography>
+                <CorvaTypography variant="body">Preferences, locale, notification posture, and theme controls for operations users.</CorvaTypography>
+              </CorvaStack>
+              <CorvaSwitch label="Dark mode" :checked="mode === 'dark'" @corvaChange="setModeFromSwitch"></CorvaSwitch>
             </div>
 
-            <ApexTabs label="Settings sections" :active-id="activeSettingsTab" :items="settingsTabs" @apexChange="setSettingsTab"></ApexTabs>
+            <CorvaTabs label="Settings sections" :active-id="activeSettingsTab" :items="settingsTabs" @corvaChange="setSettingsTab"></CorvaTabs>
 
             <div class="settings-layout">
-              <ApexPaper>
-                <ApexStack gap="md">
-                  <ApexTextField label="Display name" value="Ryan VerWey"></ApexTextField>
-                  <ApexTextField label="Workspace" value="Northstar Field Services"></ApexTextField>
-                  <ApexSelect label="Locale" value="en-US" :options="localeOptions"></ApexSelect>
-                  <ApexButton>Save account</ApexButton>
-                </ApexStack>
-              </ApexPaper>
+              <CorvaPaper>
+                <CorvaStack gap="md">
+                  <CorvaTextField label="Display name" value="Ryan VerWey"></CorvaTextField>
+                  <CorvaTextField label="Workspace" value="CorvaUI Field Services"></CorvaTextField>
+                  <CorvaSelect label="Locale" value="en-US" :options="localeOptions"></CorvaSelect>
+                  <CorvaButton>Save account</CorvaButton>
+                </CorvaStack>
+              </CorvaPaper>
 
-              <ApexStack gap="md">
-                <ApexSwitch label="Dispatch alerts" description="Notify when route risk changes." checked></ApexSwitch>
-                <ApexSwitch label="Customer approvals" description="Send approval requests from closeout." checked></ApexSwitch>
-                <ApexSwitch label="Weekly executive digest" description="Summarize SLA, margin, and open risk." checked></ApexSwitch>
-                <ApexButtonGroup label="Theme">
-                  <ApexButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">gilded-light</ApexButton>
-                  <ApexButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">gilded-dark</ApexButton>
-                </ApexButtonGroup>
-              </ApexStack>
+              <CorvaStack gap="md">
+                <CorvaSwitch label="Dispatch alerts" description="Notify when route risk changes." checked></CorvaSwitch>
+                <CorvaSwitch label="Customer approvals" description="Send approval requests from closeout." checked></CorvaSwitch>
+                <CorvaSwitch label="Weekly executive digest" description="Summarize SLA, margin, and open risk." checked></CorvaSwitch>
+                <CorvaButtonGroup label="Theme">
+                  <CorvaButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">ocean-light</CorvaButton>
+                  <CorvaButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">ocean-dark</CorvaButton>
+                </CorvaButtonGroup>
+              </CorvaStack>
             </div>
           </template>
 
           <template v-else>
             <div class="page-head">
-              <ApexStack gap="sm">
-                <ApexBadge tone="success">Package proof</ApexBadge>
-                <ApexTypography as="h1" variant="title">About this Vue demo</ApexTypography>
-                <ApexTypography variant="body">This static app proves ApexUI package integration through real business pages.</ApexTypography>
-              </ApexStack>
-              <ApexButton variant="secondary" @click="navigate('/')">Back home</ApexButton>
+              <CorvaStack gap="sm">
+                <CorvaBadge tone="success">Package proof</CorvaBadge>
+                <CorvaTypography as="h1" variant="title">About this Vue demo</CorvaTypography>
+                <CorvaTypography variant="body">This static app proves CorvaUI package integration through real business pages.</CorvaTypography>
+              </CorvaStack>
+              <CorvaButton variant="secondary" @click="navigate('/')">Back home</CorvaButton>
             </div>
 
             <div class="split-layout">
-              <ApexDataTable caption="Installed package proof" :columns="packageColumns" :rows="packageRows"></ApexDataTable>
-              <ApexPaper>
-                <ApexStack gap="md">
-                  <ApexIcon name="package" size="lg" decorative></ApexIcon>
-                  <ApexTypography as="h2" variant="title">Framework-specific integration</ApexTypography>
-                  <ApexTypography variant="body">
-                    Vue imports ApexUI wrappers directly, token CSS once in main.ts, and uses a tiny hash router because vue-router is not installed.
-                  </ApexTypography>
-                  <ApexAlert tone="info" heading="Routing">Routes are hash based so deep links survive GitHub Pages refreshes.</ApexAlert>
-                </ApexStack>
-              </ApexPaper>
+              <CorvaDataTable caption="Installed package proof" :columns="packageColumns" :rows="packageRows"></CorvaDataTable>
+              <CorvaPaper>
+                <CorvaStack gap="md">
+                  <CorvaIcon name="package" size="lg" decorative></CorvaIcon>
+                  <CorvaTypography as="h2" variant="title">Framework-specific integration</CorvaTypography>
+                  <CorvaTypography variant="body">
+                    Vue imports CorvaUI wrappers directly, token CSS once in main.ts, and uses a tiny hash router because vue-router is not installed.
+                  </CorvaTypography>
+                  <CorvaAlert tone="info" heading="Routing">Routes are hash based so deep links survive hosted refreshes.</CorvaAlert>
+                </CorvaStack>
+              </CorvaPaper>
             </div>
 
-            <ApexStack gap="sm">
-              <ApexAccordion v-for="item in proofItems" :key="item.id" :heading="item.heading" :open="item.id === 'routing'">
+            <CorvaStack gap="sm">
+              <CorvaAccordion v-for="item in proofItems" :key="item.id" :heading="item.heading" :open="item.id === 'routing'">
                 {{ item.content }}
-              </ApexAccordion>
-            </ApexStack>
+              </CorvaAccordion>
+            </CorvaStack>
           </template>
         </section>
       </div>
