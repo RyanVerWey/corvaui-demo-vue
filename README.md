@@ -1,6 +1,6 @@
 # CorvaUI Vue Demo
 
-Public Vercel demo using generated `@corvaui/vue` wrappers, `@corvaui/tokens`, and the ocean token family. The app mocks BluePort Logistics, a freight command product for shipment intake, partner records, dashboards, and lane tables.
+Public Vercel showcase using generated `@corvaui/vue` wrappers, `@corvaui/tokens`, and the Ocean token family. Northline Atlas is a four-route freight intelligence site with marketing, service comparison, a shipment DataGrid, and network reports.
 
 ## Routes
 

@@ -1,498 +1,273 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import {
-  CorvaAccordion,
   CorvaAlert,
   CorvaAppBar,
-  CorvaAutocomplete,
-  CorvaAvatar,
   CorvaBadge,
   CorvaButton,
   CorvaButtonGroup,
   CorvaCard,
   CorvaChart,
-  CorvaCheckbox,
-  CorvaChip,
   CorvaDataGrid,
   CorvaDataTable,
-  CorvaDatePicker,
-  CorvaIcon,
-  CorvaList,
-  CorvaNumberField,
   CorvaPaper,
   CorvaProgress,
-  CorvaRadioGroup,
-  CorvaSearchForm,
-  CorvaSelect,
-  CorvaSidebar,
   CorvaStack,
-  CorvaStepper,
-  CorvaSwitch,
   CorvaTabs,
-  CorvaTextarea,
-  CorvaTextField,
-  CorvaTimeline,
-  CorvaToolbar,
   CorvaTypography,
-  CorvaWorkflowBoard,
 } from "@corvaui/vue";
+import {
+  capabilityColumns,
+  capabilityRows,
+  corridorHealth,
+  dashboardRows,
+  dashboardColumns,
+  networkMix,
+  reportTabs,
+  routes,
+  shipmentColumns,
+  shipmentRows,
+  serviceColumns,
+  serviceRows,
+} from "./content";
 
 type Mode = "light" | "dark";
-type RouteId = "home" | "dashboard" | "work-orders" | "customers" | "data-table" | "settings" | "about";
-type ShipmentKey = "shipper" | "lane" | "pickup" | "equipment" | "priority" | "temperature" | "notes";
 
-const routes: Array<{ id: RouteId; path: string; label: string; badge?: string }> = [
-  { id: "home", path: "/", label: "Home" },
-  { id: "dashboard", path: "/dashboard", label: "Command", badge: "live" },
-  { id: "work-orders", path: "/work-orders", label: "Shipment intake" },
-  { id: "customers", path: "/customers", label: "Partners", badge: "18" },
-  { id: "data-table", path: "/data-table", label: "Lane table" },
-  { id: "settings", path: "/settings", label: "Settings" },
-  { id: "about", path: "/about", label: "Package proof" },
-];
-
-const routeLookup = new Map(routes.map((route) => [route.path, route]));
-const routeById = new Map(routes.map((route) => [route.id, route]));
-const normalizeHash = () => {
-  const next = window.location.hash.replace(/^#/, "") || "/";
-  return routeLookup.has(next) ? next : "/";
+const normalizePath = () => {
+  const path = window.location.hash.replace(/^#/, "") || "/";
+  return routes.some((route) => route.path === path) ? path : "/";
 };
 
+const currentPath = ref(normalizePath());
 const mode = ref<Mode>("light");
-const currentPath = ref(normalizeHash());
-const activeSettingsTab = ref("profile");
-const submittedShipment = ref(false);
-const shipment = reactive<Record<ShipmentKey, string>>({
-  shipper: "Copperline Grocery Co.",
-  lane: "Denver cold chain to Kansas City",
-  pickup: "2026-09-04",
-  equipment: "reefer",
-  priority: "expedited",
-  temperature: "34",
-  notes: "Protect produce transfer, dock appointment confirmed, require temp seal photo at pickup.",
-});
+const activeReport = ref("network");
+const theme = computed(() => `ocean-${mode.value}`);
+const currentRoute = computed(() => routes.find((route) => route.path === currentPath.value) ?? routes[0]);
 
-const themeName = computed(() => `ocean-${mode.value}`);
-const currentRoute = computed(() => routeLookup.get(currentPath.value) ?? routes[0]);
-const shellTitle = computed(() => currentRoute.value.id === "home" ? "BluePort Logistics" : `${currentRoute.value.label} | BluePort Logistics`);
-const routeSidebarItems = computed(() => routes.map(({ id, label, badge }) => ({ id, label, badge })));
-const missingShipmentFields = computed(() =>
-  (["shipper", "lane", "pickup", "equipment", "priority"] as ShipmentKey[]).filter((key) => !shipment[key]),
-);
-const shipmentReady = computed(() => missingShipmentFields.value.length === 0);
-
-const setMode = (next: Mode) => {
-  mode.value = next;
-};
-const setModeFromSwitch = (event: Event) => {
-  mode.value = (event as CustomEvent<{ checked: boolean }>).detail.checked ? "dark" : "light";
-};
-const syncHash = () => {
-  currentPath.value = normalizeHash();
-};
-const navigateById = (event: Event) => {
-  const route = routeById.get((event as CustomEvent<RouteId>).detail);
-  if (route) window.location.hash = route.path;
-};
 const navigate = (path: string) => {
   window.location.hash = path;
 };
-const setSelectValue = (key: ShipmentKey, event: Event) => {
-  shipment[key] = (event as CustomEvent<{ value: string }>).detail.value;
-};
-const setFieldValue = (key: ShipmentKey, event: Event) => {
-  shipment[key] = (event.target as HTMLInputElement).value;
-};
-const setSettingsTab = (event: Event) => {
-  activeSettingsTab.value = (event as CustomEvent<{ id: string }>).detail.id;
+
+const syncRoute = () => {
+  currentPath.value = normalizePath();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-onMounted(() => window.addEventListener("hashchange", syncHash));
-onUnmounted(() => window.removeEventListener("hashchange", syncHash));
+const setMode = (next: Mode) => {
+  mode.value = next;
+  localStorage.setItem("northline-theme", next);
+};
 
-const freightHealth = [
-  { label: "On-time loads", value: 94 },
-  { label: "Tender acceptance", value: 88 },
-  { label: "Cold chain checks", value: 97 },
-  { label: "Margin protected", value: 72 },
-];
-const costMix = [
-  { label: "Linehaul", value: 52 },
-  { label: "Fuel", value: 19 },
-  { label: "Accessorial", value: 11 },
-  { label: "Warehouse", value: 18 },
-];
-const laneColumns = [
-  { key: "lane", header: "Lane" },
-  { key: "loads", header: "Loads" },
-  { key: "margin", header: "Margin" },
-  { key: "risk", header: "Risk" },
-];
-const laneRows = [
-  { lane: "Denver to Kansas City", loads: 42, margin: "18.4%", risk: "Weather watch" },
-  { lane: "Phoenix to Salt Lake", loads: 28, margin: "21.1%", risk: "Clear" },
-  { lane: "Boise to Reno", loads: 19, margin: "16.8%", risk: "Capacity tight" },
-  { lane: "Omaha to Dallas", loads: 33, margin: "20.3%", risk: "Clear" },
-];
-const workflowColumns = [
-  {
-    id: "tendered",
-    title: "Tendered",
-    items: [
-      { id: "ld-7341", title: "Copperline produce", meta: "Reefer" },
-      { id: "ld-7344", title: "Mesa appliance transfer", meta: "Dry van" },
-    ],
-  },
-  {
-    id: "covered",
-    title: "Covered",
-    items: [
-      { id: "ld-7338", title: "Northgate pharmacy", meta: "Team driver" },
-      { id: "ld-7339", title: "Range Supply", meta: "Flatbed" },
-    ],
-  },
-  {
-    id: "settled",
-    title: "Settled",
-    items: [
-      { id: "ld-7319", title: "Prairie Foods", meta: "POD matched" },
-      { id: "ld-7324", title: "Summit Grocery", meta: "Billed" },
-    ],
-  },
-];
-const partnerRows = [
-  { account: "Copperline Grocery Co.", segment: "Cold chain", owner: "Nina Brooks", volume: "$410K", next: "Q4 lane review" },
-  { account: "Range Supply", segment: "Flatbed", owner: "Theo James", volume: "$288K", next: "Spot bid package" },
-  { account: "Mesa Appliance", segment: "Retail", owner: "Ari Shah", volume: "$196K", next: "Dock scorecard" },
-  { account: "Northgate Pharmacy", segment: "Pharma", owner: "Nina Brooks", volume: "$540K", next: "Temp audit" },
-];
-const partnerColumns = [
-  { key: "account", header: "Partner" },
-  { key: "segment", header: "Segment" },
-  { key: "owner", header: "Owner" },
-  { key: "volume", header: "Volume" },
-  { key: "next", header: "Next step" },
-];
-const loadRows = [
-  { id: "LD-7341", shipper: "Copperline Grocery", lane: "Denver to Kansas City", owner: "Nina Brooks", mode: "Reefer", status: "Covered", eta: "Fri 08:40" },
-  { id: "LD-7342", shipper: "Northgate Pharmacy", lane: "Phoenix to Salt Lake", owner: "Owen Kim", mode: "Team reefer", status: "Tracking", eta: "Thu 21:10" },
-  { id: "LD-7343", shipper: "Range Supply", lane: "Boise to Reno", owner: "Theo James", mode: "Flatbed", status: "Tendered", eta: "Sat 11:30" },
-  { id: "LD-7344", shipper: "Mesa Appliance", lane: "Omaha to Dallas", owner: "Ari Shah", mode: "Dry van", status: "Dock hold", eta: "Fri 15:00" },
-  { id: "LD-7345", shipper: "Prairie Foods", lane: "Denver to Tulsa", owner: "Nina Brooks", mode: "Reefer", status: "Delivered", eta: "Closed" },
-  { id: "LD-7346", shipper: "Summit Grocery", lane: "Reno to Spokane", owner: "Owen Kim", mode: "Dry van", status: "At risk", eta: "Thu 18:20" },
-];
-const loadColumns = [
-  { key: "id", header: "Load", sortable: true, filterable: true },
-  { key: "shipper", header: "Shipper", sortable: true, filterable: true },
-  { key: "lane", header: "Lane", sortable: true, filterable: true },
-  { key: "owner", header: "Owner", sortable: true, filterable: true },
-  { key: "mode", header: "Mode", sortable: true, filterable: true },
-  { key: "status", header: "Status", sortable: true, filterable: true },
-  { key: "eta", header: "ETA", sortable: true, filterable: true },
-];
-const packageRows = [
-  { package: "@corvaui/vue", role: "Vue 3 wrappers", proof: "Product routes import CorvaUI wrapper components directly" },
-  { package: "@corvaui/tokens", role: "Ocean theme", proof: "Root shell uses data-corva-theme with ocean-light and ocean-dark" },
-  { package: "Vite", role: "Build host", proof: "Hash routes deploy on vue.corvaui.com" },
-];
-const packageColumns = [
-  { key: "package", header: "Package" },
-  { key: "role", header: "Role" },
-  { key: "proof", header: "Proof" },
-];
-const ownerOptions = ["Nina Brooks", "Owen Kim", "Theo James", "Ari Shah"];
-const equipmentOptions = [
-  { label: "Reefer", value: "reefer" },
-  { label: "Dry van", value: "dry-van" },
-  { label: "Flatbed", value: "flatbed" },
-];
-const priorityOptions = [
-  { label: "Standard", value: "standard", description: "Cover through the normal carrier desk." },
-  { label: "Expedited", value: "expedited", description: "Escalate carrier match and pickup check-in." },
-  { label: "Critical", value: "critical", description: "Executive alert and tracked hourly." },
-];
-const localeOptions = [
-  { label: "English, United States", value: "en-US" },
-  { label: "English, Canada", value: "en-CA" },
-  { label: "Spanish, United States", value: "es-US" },
-];
-const settingsTabs = [
-  { id: "profile", label: "Profile" },
-  { id: "notifications", label: "Alerts" },
-  { id: "controls", label: "Controls" },
-];
-const shipmentSteps = [
-  { id: "quote", label: "Quote", description: "Shipper, lane, and service promise" },
-  { id: "cover", label: "Cover", description: "Carrier, equipment, and appointment" },
-  { id: "settle", label: "Settle", description: "POD, claims, and invoice match" },
-];
-const timelineEvents = [
-  { label: "06:20", description: "Snow risk added to Denver outbound lanes.", meta: "Network" },
-  { label: "08:10", description: "Cold-chain temp audits cleared for first wave.", meta: "Quality" },
-  { label: "10:45", description: "Two dock holds converted into live unloads.", meta: "Customer success" },
-];
-const proofItems = [
-  { id: "business", heading: "Business context", content: "BluePort Logistics is a believable freight command product, not a generic component sampler." },
-  { id: "tokens", heading: "Ocean tokens", content: "Vue switches between ocean-light and ocean-dark with the same package token source as docs." },
-  { id: "components", heading: "Coverage", content: "Navigation, dashboards, charts, forms, tables, workflow, settings, alerts, chips, and progress all use CorvaUI." },
-];
+const setReport = (event: Event) => {
+  activeReport.value = (event as CustomEvent<{ id: string }>).detail.id;
+};
+
+const prepareScrollableTables = async () => {
+  await nextTick();
+  window.setTimeout(() => {
+    document.querySelectorAll<HTMLElement>(".corva-table-container").forEach((container) => {
+      const caption = container.querySelector("caption")?.textContent?.trim() ?? "Data table";
+      container.tabIndex = 0;
+      container.setAttribute("role", "region");
+      container.setAttribute("aria-label", `${caption}, horizontally scrollable`);
+    });
+  }, 0);
+};
+
+watch(currentPath, prepareScrollableTables);
+
+onMounted(() => {
+  mode.value = localStorage.getItem("northline-theme") === "dark" ? "dark" : "light";
+  window.addEventListener("hashchange", syncRoute);
+  prepareScrollableTables();
+});
+
+onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
 </script>
 
 <template>
-  <main class="app-shell" :data-corva-theme="themeName">
-    <CorvaAppBar :heading="shellTitle">
-      <CorvaButtonGroup slot="actions" label="Theme mode">
+  <div class="site-shell" :data-corva-theme="theme">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <CorvaAppBar heading="Northline Atlas">
+      <nav slot="navigation" class="primary-nav" aria-label="Primary navigation">
+        <a
+          v-for="route in routes"
+          :key="route.id"
+          :href="`#${route.path}`"
+          :aria-current="currentPath === route.path ? 'page' : undefined"
+        >{{ route.label }}</a>
+      </nav>
+      <CorvaButtonGroup slot="actions" label="Color mode">
         <CorvaButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">Light</CorvaButton>
         <CorvaButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">Dark</CorvaButton>
       </CorvaButtonGroup>
     </CorvaAppBar>
+    <details class="mobile-menu">
+      <summary>Menu</summary>
+      <nav aria-label="Mobile navigation">
+        <a v-for="route in routes" :key="route.id" :href="`#${route.path}`" :aria-current="currentPath === route.path ? 'page' : undefined">{{ route.label }}</a>
+      </nav>
+    </details>
 
-    <div class="app-main">
-      <div class="app-layout">
-        <CorvaSidebar heading="BluePort" label="Freight workspace" :active-id="currentRoute.id" :items="routeSidebarItems" @corvaSelect="navigateById">
-          <CorvaBadge slot="footer" tone="info">{{ themeName }}</CorvaBadge>
-        </CorvaSidebar>
-
-        <section class="app-page" :aria-label="currentRoute.label">
-          <template v-if="currentRoute.id === 'home'">
-            <CorvaPaper>
-              <div class="hero-layout">
-                <CorvaStack gap="md">
-                  <CorvaBadge tone="info">Freight network control</CorvaBadge>
-                  <CorvaTypography as="h1" variant="display">BluePort turns volatile freight days into readable operating plans.</CorvaTypography>
-                  <CorvaTypography variant="body">
-                    A transportation workspace for brokers and shipper teams balancing service promises, margin, carriers, and dock exceptions across regional lanes.
-                  </CorvaTypography>
-                  <CorvaSearchForm label="Search logistics network" placeholder="Load, shipper, lane, owner"></CorvaSearchForm>
-                  <div class="action-row">
-                    <CorvaButton @click="navigate('/work-orders')">Book a shipment</CorvaButton>
-                    <CorvaButton variant="secondary" @click="navigate('/dashboard')">Open command center</CorvaButton>
-                  </div>
-                </CorvaStack>
-
-                <div class="hero-visual" aria-label="Freight health snapshot">
-                  <div class="visual-row">
-                    <CorvaIcon name="route" size="lg" decorative></CorvaIcon>
-                    <span>214 active loads</span>
-                  </div>
-                  <CorvaProgress label="Loads with carrier acceptance" :value="88"></CorvaProgress>
-                  <CorvaProgress label="On-time pickup forecast" :value="94"></CorvaProgress>
-                  <CorvaProgress label="POD packets matched" :value="76"></CorvaProgress>
-                </div>
-              </div>
-            </CorvaPaper>
-
-            <div class="proof-grid">
-              <CorvaCard eyebrow="Network" heading="Lane health at a glance">Dispatchers see tender acceptance, dwell, carrier capacity, and weather risk without a spreadsheet relay.</CorvaCard>
-              <CorvaCard eyebrow="Margin" heading="Every exception has a cost">Fuel movement, detention, and re-rate approvals stay visible next to operational status.</CorvaCard>
-              <CorvaCard eyebrow="Customer proof" heading="Status without status calls">Shippers get load history, temp proof, ETA changes, and invoice evidence from the same record.</CorvaCard>
+    <main id="main-content" tabindex="-1">
+      <template v-if="currentRoute.id === 'home'">
+        <section class="hero" aria-labelledby="home-title">
+          <div class="hero-copy">
+            <CorvaBadge tone="info">Freight intelligence, made legible</CorvaBadge>
+            <CorvaTypography id="home-title" as="h1" variant="display">See the whole route before the first mile moves.</CorvaTypography>
+            <CorvaTypography variant="body">
+              Northline Atlas gives logistics teams one operating picture for ocean, rail, and over-the-road freight. Plan around disruption, protect margin, and keep customers ahead of every handoff.
+            </CorvaTypography>
+            <div class="hero-actions">
+              <CorvaButton @click="navigate('/dashboard')">Explore live reports</CorvaButton>
+              <CorvaButton variant="secondary" @click="navigate('/about')">Compare services</CorvaButton>
             </div>
-
-            <CorvaToolbar label="Launch desk">
-              <CorvaButton size="sm" @click="navigate('/customers')">Review partners</CorvaButton>
-              <CorvaButton size="sm" variant="secondary" @click="navigate('/data-table')">Audit load grid</CorvaButton>
-            </CorvaToolbar>
-          </template>
-
-          <template v-else-if="currentRoute.id === 'dashboard'">
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge tone="success">Command center live</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">Freight command dashboard</CorvaTypography>
-                <CorvaTypography variant="body">Network health, lane risk, margin movement, and tender flow for the current operating day.</CorvaTypography>
-              </CorvaStack>
-              <CorvaButton variant="secondary" @click="navigate('/work-orders')">Add load</CorvaButton>
+            <div class="proof-line" aria-label="Network proof">
+              <span><strong>38</strong> ports connected</span>
+              <span><strong>94%</strong> on-time forecast</span>
+              <span><strong>11 min</strong> alert lead time</span>
             </div>
-
-            <div class="stat-grid">
-              <CorvaCard eyebrow="Active freight" heading="214 loads">37 require check-in before the next appointment window.</CorvaCard>
-              <CorvaCard eyebrow="Service" heading="94% on time">Snow watch is isolated to Denver outbound refrigerated freight.</CorvaCard>
-              <CorvaCard eyebrow="Gross margin" heading="$186K">Accessorial leakage fell after detention approvals moved into the workflow.</CorvaCard>
-            </div>
-
-            <div class="chart-grid">
-              <CorvaChart label="Freight health" :data="freightHealth"></CorvaChart>
-              <CorvaChart label="Cost mix" :data="costMix"></CorvaChart>
-            </div>
-
-            <div class="split-layout">
-              <CorvaDataTable caption="Priority lanes" :columns="laneColumns" :rows="laneRows"></CorvaDataTable>
-              <CorvaStack gap="md">
-                <CorvaWorkflowBoard :columns="workflowColumns"></CorvaWorkflowBoard>
-                <CorvaTimeline :events="timelineEvents"></CorvaTimeline>
-              </CorvaStack>
-            </div>
-          </template>
-
-          <template v-else-if="currentRoute.id === 'work-orders'">
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge :tone="shipmentReady ? 'success' : 'warning'">{{ shipmentReady ? "Shipment ready to tender" : "Required shipment details missing" }}</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">Shipment intake</CorvaTypography>
-                <CorvaTypography variant="body">Capture lane, shipper, equipment, temperature, and priority details before the load reaches the carrier desk.</CorvaTypography>
-              </CorvaStack>
-              <CorvaStepper :steps="shipmentSteps" :active-index="submittedShipment ? 1 : 0"></CorvaStepper>
-            </div>
-
-            <div class="form-layout">
-              <CorvaPaper>
-                <CorvaStack gap="md">
-                  <CorvaTextField label="Shipper" :value="shipment.shipper" :error="submittedShipment && !shipment.shipper ? 'Shipper is required.' : undefined" @input="setFieldValue('shipper', $event)"></CorvaTextField>
-                  <CorvaTextField label="Lane" :value="shipment.lane" :error="submittedShipment && !shipment.lane ? 'Lane is required.' : undefined" @input="setFieldValue('lane', $event)"></CorvaTextField>
-                  <div class="field-grid">
-                    <CorvaDatePicker label="Pickup date" :value="shipment.pickup"></CorvaDatePicker>
-                    <CorvaSelect label="Equipment" :value="shipment.equipment" :options="equipmentOptions" @corvaChange="setSelectValue('equipment', $event)"></CorvaSelect>
-                    <CorvaNumberField label="Target temp" :value="shipment.temperature" :min="-10" :max="80" :step="1"></CorvaNumberField>
-                  </div>
-                  <CorvaRadioGroup label="Priority" name="shipment-priority" :value="shipment.priority" :options="priorityOptions"></CorvaRadioGroup>
-                  <CorvaTextarea label="Load notes" :value="shipment.notes" @input="setFieldValue('notes', $event)"></CorvaTextarea>
-                  <CorvaCheckbox label="Require carrier seal photo before pickup" checked></CorvaCheckbox>
-                  <div class="action-row">
-                    <CorvaButton @click="submittedShipment = true">Validate load</CorvaButton>
-                    <CorvaButton variant="secondary" @click="navigate('/dashboard')">Back to dashboard</CorvaButton>
-                  </div>
-                </CorvaStack>
-              </CorvaPaper>
-
-              <CorvaStack gap="md">
-                <CorvaAlert :tone="shipmentReady ? 'success' : 'warning'" heading="Tender readiness">Missing {{ missingShipmentFields.length }} required fields. Refrigerated freight requires pickup proof and temperature notes.</CorvaAlert>
-                <CorvaCard eyebrow="Preview" :heading="shipment.shipper">{{ shipment.lane }}. {{ shipment.equipment }} equipment, {{ shipment.priority }} priority, {{ shipment.temperature }} degrees.</CorvaCard>
-                <CorvaList>
-                  <li><strong>Carrier desk</strong><span>Confirm accepted rate, appointment, and equipment match.</span></li>
-                  <li><strong>Quality</strong><span>Temperature-controlled freight must have seal and photo proof.</span></li>
-                  <li><strong>Finance</strong><span>Detention and re-rate approvals stay tied to the load.</span></li>
-                </CorvaList>
-              </CorvaStack>
-            </div>
-          </template>
-
-          <template v-else-if="currentRoute.id === 'customers'">
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge tone="info">Partner records</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">Shipper and carrier command</CorvaTypography>
-                <CorvaTypography variant="body">Commercial records connect revenue, service commitments, claim risk, and carrier quality.</CorvaTypography>
-              </CorvaStack>
-              <CorvaSearchForm label="Search partners" placeholder="Partner, lane, owner, segment"></CorvaSearchForm>
-            </div>
-
-            <div class="split-layout">
-              <CorvaDataGrid caption="Partner pipeline" :columns="partnerColumns" :rows="partnerRows"></CorvaDataGrid>
-              <CorvaPaper>
-                <CorvaStack gap="md">
-                  <CorvaAvatar name="Copperline Grocery Co."></CorvaAvatar>
-                  <CorvaTypography as="h2" variant="title">Copperline Grocery Co.</CorvaTypography>
-                  <CorvaTypography variant="body">Cold-chain shipper with 44 stores, strict temperature proof, and weekly Denver outbound volume.</CorvaTypography>
-                  <div class="chip-row">
-                    <CorvaChip selected>Cold chain</CorvaChip>
-                    <CorvaChip>High volume</CorvaChip>
-                    <CorvaChip>Q4 review</CorvaChip>
-                  </div>
-                  <CorvaProgress label="Renewal confidence" :value="82"></CorvaProgress>
-                  <CorvaAutocomplete label="Account owner" value="Nina Brooks" :options="ownerOptions"></CorvaAutocomplete>
-                  <CorvaButton @click="navigate('/work-orders')">Create load</CorvaButton>
-                </CorvaStack>
-              </CorvaPaper>
-            </div>
-          </template>
-
-          <template v-else-if="currentRoute.id === 'data-table'">
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge tone="info">Operational records</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">Lane and load table</CorvaTypography>
-                <CorvaTypography variant="body">Sortable, filterable load records prove Vue wrapper parity against a realistic logistics dataset.</CorvaTypography>
-              </CorvaStack>
-              <CorvaButtonGroup label="Grid actions">
-                <CorvaButton size="sm" variant="secondary">Export CSV</CorvaButton>
-                <CorvaButton size="sm">Save view</CorvaButton>
-              </CorvaButtonGroup>
-            </div>
-
-            <CorvaToolbar label="Load table controls">
-              <CorvaSearchForm label="Search loads" placeholder="Load, shipper, lane, owner, mode"></CorvaSearchForm>
-              <CorvaBadge tone="success">6 loads</CorvaBadge>
-            </CorvaToolbar>
-
-            <div class="split-layout wide-left">
-              <CorvaDataGrid caption="Load operations grid" :columns="loadColumns" :rows="loadRows" sortable filterable pageable :page-size="4"></CorvaDataGrid>
-              <CorvaPaper>
-                <CorvaStack gap="md">
-                  <CorvaTypography as="h2" variant="title">Grid policy</CorvaTypography>
-                  <CorvaProgress label="Loads with full proof packet" :value="76"></CorvaProgress>
-                  <CorvaAlert tone="info" heading="Wrapper behavior">Vue passes typed arrays to CorvaUI wrappers, so DataGrid owns sort, filter, and page state.</CorvaAlert>
-                  <CorvaList>
-                    <li><strong>Sort</strong><span>Use columns to isolate late ETA risk.</span></li>
-                    <li><strong>Filter</strong><span>Filter by lane, status, owner, or equipment.</span></li>
-                    <li><strong>Page</strong><span>Page size is set from Vue state.</span></li>
-                  </CorvaList>
-                </CorvaStack>
-              </CorvaPaper>
-            </div>
-          </template>
-
-          <template v-else-if="currentRoute.id === 'settings'">
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge tone="info">Workspace controls</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">Settings and account</CorvaTypography>
-                <CorvaTypography variant="body">Preferences, locale, notification posture, and theme controls for logistics operators.</CorvaTypography>
-              </CorvaStack>
-              <CorvaSwitch label="Dark mode" :checked="mode === 'dark'" @corvaChange="setModeFromSwitch"></CorvaSwitch>
-            </div>
-
-            <CorvaTabs label="Settings sections" :active-id="activeSettingsTab" :items="settingsTabs" @corvaChange="setSettingsTab"></CorvaTabs>
-
-            <div class="settings-layout">
-              <CorvaPaper>
-                <CorvaStack gap="md">
-                  <CorvaTextField label="Display name" value="Nina Brooks"></CorvaTextField>
-                  <CorvaTextField label="Workspace" value="BluePort Logistics"></CorvaTextField>
-                  <CorvaSelect label="Locale" value="en-US" :options="localeOptions"></CorvaSelect>
-                  <CorvaButton>Save account</CorvaButton>
-                </CorvaStack>
-              </CorvaPaper>
-
-              <CorvaStack gap="md">
-                <CorvaSwitch label="Weather risk alerts" description="Notify when lane confidence changes." checked></CorvaSwitch>
-                <CorvaSwitch label="Carrier acceptance digest" description="Summarize tender acceptance by region." checked></CorvaSwitch>
-                <CorvaSwitch label="Cold-chain proof lock" description="Prevent settlement when temp evidence is missing." checked></CorvaSwitch>
-                <CorvaButtonGroup label="Theme">
-                  <CorvaButton size="sm" :variant="mode === 'light' ? 'primary' : 'secondary'" @click="setMode('light')">ocean-light</CorvaButton>
-                  <CorvaButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">ocean-dark</CorvaButton>
-                </CorvaButtonGroup>
-              </CorvaStack>
-            </div>
-          </template>
-
-          <template v-else>
-            <div class="page-head">
-              <CorvaStack gap="sm">
-                <CorvaBadge tone="success">Package proof</CorvaBadge>
-                <CorvaTypography as="h1" variant="title">About this Vue demo</CorvaTypography>
-                <CorvaTypography variant="body">This static Vue app proves CorvaUI package integration through a logistics product mockup.</CorvaTypography>
-              </CorvaStack>
-              <CorvaButton variant="secondary" @click="navigate('/')">Back home</CorvaButton>
-            </div>
-
-            <div class="split-layout">
-              <CorvaDataTable caption="Installed package proof" :columns="packageColumns" :rows="packageRows"></CorvaDataTable>
-              <CorvaPaper>
-                <CorvaStack gap="md">
-                  <CorvaIcon name="package" size="lg" decorative></CorvaIcon>
-                  <CorvaTypography as="h2" variant="title">Framework-specific integration</CorvaTypography>
-                  <CorvaTypography variant="body">Vue imports CorvaUI wrappers directly, token CSS once in main.ts, and uses a small hash router for Vercel-safe static routes.</CorvaTypography>
-                  <CorvaAlert tone="info" heading="Routing">Routes are hash based so hosted refreshes stay simple.</CorvaAlert>
-                </CorvaStack>
-              </CorvaPaper>
-            </div>
-
-            <CorvaStack gap="sm">
-              <CorvaAccordion v-for="item in proofItems" :key="item.id" :heading="item.heading" :open="item.id === 'business'">{{ item.content }}</CorvaAccordion>
-            </CorvaStack>
-          </template>
+          </div>
+          <figure class="hero-image">
+            <img src="https://images.unsplash.com/photo-1494412519320-aa613dfb7738?auto=format&fit=crop&w=1500&q=84" alt="Container vessel and cranes working at a coastal freight terminal" />
+            <figcaption>
+              <span>Pacific network</span>
+              <strong>16 exceptions resolved before cut-off</strong>
+            </figcaption>
+          </figure>
         </section>
-      </div>
-    </div>
-  </main>
+
+        <section class="signal-band" aria-labelledby="signal-title">
+          <div class="section-heading">
+            <CorvaBadge tone="success">Decision network</CorvaBadge>
+            <CorvaTypography id="signal-title" as="h2" variant="title">A clearer answer at every handoff.</CorvaTypography>
+            <p>One operating model connects planning, execution, and customer communication without flattening the details that matter.</p>
+          </div>
+          <div class="signal-flow">
+            <article><span>01</span><h3>Forecast</h3><p>Blend capacity, weather, port, and carrier signals into a usable lane outlook.</p></article>
+            <article><span>02</span><h3>Decide</h3><p>Compare cost, service, and carbon before approving the next route.</p></article>
+            <article><span>03</span><h3>Explain</h3><p>Give every customer a precise status, impact, and recovery plan.</p></article>
+          </div>
+        </section>
+
+        <section class="network-story" aria-labelledby="network-title">
+          <div class="route-visual" aria-label="Illustrated freight route from Oakland to Rotterdam">
+            <span class="route-point point-a">Oakland</span>
+            <span class="route-point point-b">Panama</span>
+            <span class="route-point point-c">Rotterdam</span>
+            <div class="route-line"></div>
+          </div>
+          <CorvaStack gap="md">
+            <CorvaBadge tone="info">Live corridor</CorvaBadge>
+            <CorvaTypography id="network-title" as="h2" variant="title">Oakland to Rotterdam, without the blind spots.</CorvaTypography>
+            <CorvaTypography variant="body">Northline watches port congestion, intermodal capacity, customs windows, and final-mile appointments as one route, not four disconnected systems.</CorvaTypography>
+            <CorvaProgress label="Route confidence" :value="91"></CorvaProgress>
+            <CorvaAlert tone="success" heading="Recovery protected">Panama dwell is trending down. Current arrival window remains within customer tolerance.</CorvaAlert>
+          </CorvaStack>
+        </section>
+
+        <section class="closing-band" aria-labelledby="closing-title">
+          <CorvaTypography id="closing-title" as="h2" variant="title">Freight is complicated. The operating picture should not be.</CorvaTypography>
+          <CorvaButton @click="navigate('/data-table')">Open shipment network</CorvaButton>
+        </section>
+      </template>
+
+      <template v-else-if="currentRoute.id === 'about'">
+        <header class="page-hero">
+          <div>
+            <CorvaBadge tone="info">Service architecture</CorvaBadge>
+            <CorvaTypography as="h1" variant="display">Choose the control layer your network needs.</CorvaTypography>
+            <CorvaTypography variant="body">From visibility to managed intervention, every tier uses the same decision model and customer-ready record.</CorvaTypography>
+          </div>
+          <CorvaCard eyebrow="Network standard" heading="One source of route truth">Every plan includes live milestone history, role-based handoffs, and exportable customer evidence.</CorvaCard>
+        </header>
+
+        <section class="content-section" aria-labelledby="service-title">
+          <div class="section-heading compact">
+            <CorvaTypography id="service-title" as="h2" variant="title">Service comparison</CorvaTypography>
+            <p>Clear boundaries make it easier to buy the right operational depth.</p>
+          </div>
+          <CorvaDataTable caption="Northline service tiers" :columns="serviceColumns" :rows="serviceRows"></CorvaDataTable>
+        </section>
+
+        <section class="comparison-layout" aria-labelledby="capability-title">
+          <CorvaPaper>
+            <CorvaStack gap="md">
+              <CorvaTypography id="capability-title" as="h2" variant="title">Capability by transport mode</CorvaTypography>
+              <CorvaDataTable caption="Transport capability matrix" :columns="capabilityColumns" :rows="capabilityRows"></CorvaDataTable>
+            </CorvaStack>
+          </CorvaPaper>
+          <div class="principles-panel">
+            <span class="principle-number">04</span>
+            <h2>Built for the moment a plan changes.</h2>
+            <p>Static visibility is not enough. Northline connects each exception to an owner, a deadline, a commercial impact, and the next best action.</p>
+            <CorvaButton variant="secondary" @click="navigate('/dashboard')">See reporting depth</CorvaButton>
+          </div>
+        </section>
+      </template>
+
+      <template v-else-if="currentRoute.id === 'data-table'">
+        <header class="page-hero data-hero">
+          <div>
+            <CorvaBadge tone="success">Network current at 14:32 UTC</CorvaBadge>
+            <CorvaTypography as="h1" variant="display">Shipment network</CorvaTypography>
+            <CorvaTypography variant="body">Filter active freight by lane, owner, mode, and exception state. Every row is shaped for fast operational scanning.</CorvaTypography>
+          </div>
+          <div class="data-summary" aria-label="Shipment summary">
+            <span><strong>126</strong> active</span>
+            <span><strong>9</strong> need action</span>
+            <span><strong>3</strong> customer holds</span>
+          </div>
+        </header>
+        <section class="grid-shell" aria-label="Active shipment records">
+          <CorvaDataGrid caption="Active shipment network" :columns="shipmentColumns" :rows="shipmentRows" sortable filterable pageable :page-size="6"></CorvaDataGrid>
+        </section>
+        <CorvaAlert tone="info" heading="DataGrid proof">The Vue wrapper receives typed columns and rows directly. Sorting, filtering, pagination, and theme states come from CorvaUI.</CorvaAlert>
+      </template>
+
+      <template v-else>
+        <header class="page-hero reports-hero">
+          <div>
+            <CorvaBadge tone="info">Week 35 network review</CorvaBadge>
+            <CorvaTypography as="h1" variant="display">Reports that lead to a decision.</CorvaTypography>
+            <CorvaTypography variant="body">Service, cost, and disruption signals stay close enough to explain what changed and what the team should do next.</CorvaTypography>
+          </div>
+          <CorvaTabs label="Report view" :items="reportTabs" :active-id="activeReport" @corvaSelect="setReport"></CorvaTabs>
+        </header>
+
+        <section class="metric-rail" aria-label="Network metrics">
+          <article><span>Forecast accuracy</span><strong>94.2%</strong><small>+2.6 pts</small></article>
+          <article><span>Cost protected</span><strong>$418K</strong><small>this quarter</small></article>
+          <article><span>Exception age</span><strong>46 min</strong><small>-18 min</small></article>
+          <article><span>Carbon intensity</span><strong>71 g</strong><small>CO2e / tkm</small></article>
+        </section>
+
+        <section class="report-grid">
+          <CorvaPaper><CorvaChart label="Corridor health" :data="corridorHealth"></CorvaChart></CorvaPaper>
+          <CorvaPaper><CorvaChart label="Network mode mix" :data="networkMix"></CorvaChart></CorvaPaper>
+        </section>
+
+        <section class="report-detail" aria-labelledby="watch-title">
+          <div>
+            <div class="section-heading compact">
+              <CorvaTypography id="watch-title" as="h2" variant="title">Lane watch</CorvaTypography>
+              <p>Priority corridors sorted by service exposure.</p>
+            </div>
+            <CorvaDataTable caption="Priority lane report" :columns="dashboardColumns" :rows="dashboardRows"></CorvaDataTable>
+          </div>
+          <CorvaStack gap="md">
+            <CorvaCard eyebrow="Recommended action" heading="Pull Chicago rail forward">Capacity remains available today. Moving 11 containers now protects the Friday transload window.</CorvaCard>
+            <CorvaProgress label="Team response within SLA" :value="89"></CorvaProgress>
+            <CorvaAlert tone="warning" heading="Two decisions due">Pacific Northwest reefer and Houston import dray need owners before 16:00 UTC.</CorvaAlert>
+          </CorvaStack>
+        </section>
+      </template>
+    </main>
+
+    <footer>
+      <span>Northline Atlas</span>
+      <span>Vue 3 + CorvaUI</span>
+      <a href="https://www.corvaui.com/">Design system documentation</a>
+    </footer>
+  </div>
 </template>

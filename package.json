@@ -7,7 +7,9 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm audit && npm run build"
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "npm audit && npm run test:unit && npm run build"
   },
   "dependencies": {
     "@corvaui/tokens": "0.1.7",
@@ -18,5 +20,9 @@
     "vue": "^3.5.0",
     "vue-tsc": "^2.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "axe-core": "^4.13.0",
+    "vitest": "^4.1.11"
+  }
 }
