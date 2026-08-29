@@ -3,6 +3,7 @@ export const routes = [
   { id: "about", label: "Compare", path: "/about" },
   { id: "data-table", label: "Shipments", path: "/data-table" },
   { id: "dashboard", label: "Reports", path: "/dashboard" },
+  { id: "control", label: "Control", path: "/control" },
 ] as const;
 
 export const serviceColumns = [
@@ -76,4 +77,16 @@ export const reportTabs = [
   { id: "network", label: "Network" },
   { id: "service", label: "Service" },
   { id: "cost", label: "Cost" },
+];
+
+export const controlWorkflow = [
+  { id: "detect", title: "Detected", items: [{ id: "port", title: "Oakland berth slip", meta: "18 min ago" }, { id: "reefer", title: "Reefer temperature watch", meta: "Owner needed" }] },
+  { id: "decide", title: "Decision due", items: [{ id: "rail", title: "Pull Chicago rail forward", meta: "By 16:00 UTC" }, { id: "dray", title: "Houston dray recovery", meta: "$22K exposure" }] },
+  { id: "protect", title: "Protected", items: [{ id: "customs", title: "Rotterdam customs window", meta: "Customer updated" }] },
+];
+
+export const controlTimeline = [
+  { id: "signal", label: "Port signal confirmed", description: "Terminal dwell moved outside the customer tolerance.", meta: "14:18" },
+  { id: "option", label: "Recovery options scored", description: "Rail pull-forward protects the Friday transload window.", meta: "14:24" },
+  { id: "owner", label: "Decision assigned", description: "Mina Park owns carrier approval and customer note.", meta: "14:27" },
 ];

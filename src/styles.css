@@ -53,6 +53,10 @@ main { width: min(100%, 1240px); margin-inline: auto; padding: clamp(1rem, 3vw, 
 .page-photo img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.78) contrast(1.04); }
 .page-photo figcaption { position: absolute; inset: auto .8rem .8rem; display: grid; gap: .2rem; padding: .8rem .9rem; color: oklch(97% .01 220); background: oklch(20% .035 235 / .93); border-radius: var(--corva-radius-sm); }
 .page-photo figcaption span { font-size: .72rem; font-weight: 800; text-transform: uppercase; }
+.control-status { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: flex-end; padding: 1rem; border: 1px solid var(--corva-color-border); background: var(--corva-color-surface); }
+.control-status span { display: grid; min-width: 9rem; color: var(--corva-color-muted); font-size: .8rem; }
+.control-status strong { color: var(--corva-color-heading); font-size: 1.45rem; }
+.control-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 1.25rem; align-items: start; }
 .content-section { padding-block: 1rem 4rem; }
 .comparison-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 1.5rem; padding-bottom: 4rem; }
 .principles-panel { display: grid; align-content: center; gap: 1rem; padding: clamp(1.5rem, 4vw, 3rem); color: var(--corva-color-heading); background: var(--corva-color-subtle); border-radius: var(--corva-radius-lg); }
@@ -78,7 +82,7 @@ corva-data-grid, corva-data-table, corva-paper { display: block; width: 100%; mi
 .site-shell .corva-table-container { width: 100%; max-width: 100%; overflow-x: auto; }
 .content-section, .report-detail > div, .comparison-layout > * { min-width: 0; max-width: 100%; overflow: hidden; }
 @media (max-width: 900px) {
-  .hero, .network-story, .page-hero, .comparison-layout, .report-detail { grid-template-columns: 1fr; }
+  .hero, .network-story, .page-hero, .comparison-layout, .report-detail, .control-layout { grid-template-columns: 1fr; }
   .hero { min-height: auto; }
   .hero-image, .hero-image img { min-height: 390px; }
   .metric-rail { grid-template-columns: repeat(2, 1fr); }

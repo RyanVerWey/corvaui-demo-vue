@@ -10,15 +10,23 @@ import {
   CorvaChart,
   CorvaDataGrid,
   CorvaDataTable,
+  CorvaDatePicker,
   CorvaPaper,
   CorvaProgress,
+  CorvaSelect,
   CorvaStack,
+  CorvaSwitch,
   CorvaTabs,
+  CorvaTextField,
+  CorvaTimeline,
   CorvaTypography,
+  CorvaWorkflowBoard,
 } from "@corvaui/vue";
 import {
   capabilityColumns,
   capabilityRows,
+  controlTimeline,
+  controlWorkflow,
   corridorHealth,
   dashboardRows,
   dashboardColumns,
@@ -41,6 +49,11 @@ const normalizePath = () => {
 const currentPath = ref(normalizePath());
 const mode = ref<Mode>("light");
 const activeReport = ref("network");
+const recoveryOptions = [
+  { label: "Pull rail forward", value: "rail" },
+  { label: "Priority dray", value: "dray" },
+  { label: "Hold current plan", value: "hold" },
+];
 const theme = computed(() => `ocean-${mode.value}`);
 const currentRoute = computed(() => routes.find((route) => route.path === currentPath.value) ?? routes[0]);
 
@@ -232,7 +245,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
         <CorvaAlert tone="info" heading="DataGrid proof">The Vue wrapper receives typed columns and rows directly. Sorting, filtering, pagination, and theme states come from CorvaUI.</CorvaAlert>
       </template>
 
-      <template v-else>
+      <template v-else-if="currentRoute.id === 'dashboard'">
         <header class="page-hero reports-hero">
           <div>
             <CorvaBadge tone="info">Week 35 network review</CorvaBadge>
@@ -268,6 +281,49 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
             <CorvaProgress label="Team response within SLA" :value="89"></CorvaProgress>
             <CorvaAlert tone="warning" heading="Two decisions due">Pacific Northwest reefer and Houston import dray need owners before 16:00 UTC.</CorvaAlert>
           </CorvaStack>
+        </section>
+      </template>
+
+      <template v-else>
+        <header class="page-hero control-hero">
+          <div>
+            <CorvaBadge tone="warning">4 decisions due</CorvaBadge>
+            <CorvaTypography as="h1" variant="display">Network control room</CorvaTypography>
+            <CorvaTypography variant="body">Move from signal to owned recovery without losing the customer, commercial, or timing context behind the decision.</CorvaTypography>
+          </div>
+          <div class="control-status" aria-label="Control room status">
+            <span><strong>11 min</strong>alert lead</span>
+            <span><strong>$182K</strong>exposure protected</span>
+            <CorvaBadge tone="success">Team online</CorvaBadge>
+          </div>
+        </header>
+
+        <section class="control-layout" aria-labelledby="decision-title">
+          <CorvaPaper>
+            <CorvaStack gap="md">
+              <CorvaTypography id="decision-title" as="h2" variant="title">Decision workspace</CorvaTypography>
+              <CorvaSelect label="Recovery option" :options="recoveryOptions" value="rail"></CorvaSelect>
+              <CorvaTextField label="Decision owner" value="Mina Park"></CorvaTextField>
+              <CorvaDatePicker label="Customer commitment" value="2026-08-29"></CorvaDatePicker>
+              <CorvaSwitch label="Publish customer update on approval" checked></CorvaSwitch>
+              <CorvaAlert tone="info" heading="Commercial impact">Pulling 11 containers forward costs $8,400 and protects $62,000 in service exposure.</CorvaAlert>
+              <CorvaButton>Approve recovery plan</CorvaButton>
+            </CorvaStack>
+          </CorvaPaper>
+          <CorvaPaper>
+            <CorvaStack gap="md">
+              <CorvaTypography as="h2" variant="title">Decision trace</CorvaTypography>
+              <CorvaTimeline :events="controlTimeline"></CorvaTimeline>
+            </CorvaStack>
+          </CorvaPaper>
+        </section>
+
+        <section class="content-section" aria-labelledby="workflow-title">
+          <div class="section-heading compact">
+            <CorvaTypography id="workflow-title" as="h2" variant="title">Exception workflow</CorvaTypography>
+            <p>Every active signal has a stage, an owner, a deadline, and a visible outcome.</p>
+          </div>
+          <CorvaWorkflowBoard :columns="controlWorkflow"></CorvaWorkflowBoard>
         </section>
       </template>
     </main>

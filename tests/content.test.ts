@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { routes, serviceRows, shipmentRows, corridorHealth, networkMix } from "../src/content";
 
 describe("Northline Atlas demo contract", () => {
-  it("ships exactly the four required showcase routes", () => {
-    expect(routes.map((route) => route.path)).toEqual(["/", "/about", "/data-table", "/dashboard"]);
+  it("ships the complete showcase route set", () => {
+    expect(routes.map((route) => route.path)).toEqual(["/", "/about", "/data-table", "/dashboard", "/control"]);
   });
   it("uses unique shipment identifiers and realistic table depth", () => {
     const ids = shipmentRows.map((row) => row.id);
