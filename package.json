@@ -12,11 +12,11 @@
     "test": "npm audit && npm run test:unit && npm run build && npm run test:e2e"
   },
   "dependencies": {
-    "@corvaui/tokens": "0.1.7",
-    "@corvaui/vue": "0.1.7",
+    "@corvaui/tokens": "^0.1.8",
+    "@corvaui/vue": "^0.1.8",
     "@vitejs/plugin-vue": "^6.0.8",
-    "vite": "^8.2.2",
     "typescript": "^5.8.3",
+    "vite": "^8.2.2",
     "vue": "^3.5.0",
     "vue-tsc": "^2.2.0"
   },
