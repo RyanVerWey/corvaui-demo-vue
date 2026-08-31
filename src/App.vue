@@ -49,6 +49,11 @@ const normalizePath = () => {
 const currentPath = ref(normalizePath());
 const mode = ref<Mode>("light");
 const activeReport = ref("network");
+const reportSeries = [
+  { key: "service", label: "Service", color: "var(--corva-color-chart-series-1)" },
+  { key: "onTime", label: "On time", color: "var(--corva-color-chart-series-4)" },
+  { key: "plan", label: "Plan", color: "var(--corva-color-chart-series-5)" },
+];
 const recoveryOptions = [
   { label: "Pull rail forward", value: "rail" },
   { label: "Priority dray", value: "dray" },
@@ -263,7 +268,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
         </section>
 
         <section class="report-grid">
-          <CorvaPaper><CorvaChart label="Corridor health" :data="corridorHealth"></CorvaChart></CorvaPaper>
+          <CorvaPaper><CorvaChart label="Corridor health" type="area" :data="corridorHealth" :series="reportSeries"></CorvaChart></CorvaPaper>
           <CorvaPaper><CorvaChart label="Network mode mix" :data="networkMix"></CorvaChart></CorvaPaper>
         </section>
 

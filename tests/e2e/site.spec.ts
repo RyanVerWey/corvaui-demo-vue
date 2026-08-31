@@ -57,3 +57,14 @@ test("theme control applies an accessible Ocean dark mode", async ({ page }, tes
   expect(violations).toEqual([]);
   await page.screenshot({ path: testInfo.outputPath("ocean-dark.png"), fullPage: true });
 });
+
+test("reports render three distinct Ocean chart series", async ({ page }) => {
+  await page.goto("/#/dashboard", { waitUntil: "networkidle" });
+  const legend = page.getByRole("group", { name: "Corridor health series" });
+  await expect(legend).toBeVisible();
+  await expect(page.locator(".corva-chart-legend-item")).toHaveCount(3);
+  const colors = await page.locator(".corva-chart-swatch").evaluateAll((nodes) =>
+    nodes.map((node) => getComputedStyle(node).backgroundColor),
+  );
+  expect(new Set(colors).size).toBe(3);
+});

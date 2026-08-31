@@ -50,10 +50,10 @@ export const shipmentRows = [
   { id: "NA-82004", customer: "June & Pine", lane: "Vancouver to Denver", mode: "Rail + truck", milestone: "Ramp / 12h", status: "On plan", owner: "Nora Singh" },
 ];
 export const corridorHealth = [
-  { label: "Pacific", value: 92 },
-  { label: "Atlantic", value: 86 },
-  { label: "Mexico", value: 78 },
-  { label: "Europe", value: 89 },
+  { label: "Pacific", service: 92, onTime: 88, plan: 90 },
+  { label: "Atlantic", service: 86, onTime: 91, plan: 88 },
+  { label: "Mexico", service: 78, onTime: 82, plan: 86 },
+  { label: "Europe", service: 89, onTime: 87, plan: 89 },
 ];
 export const networkMix = [
   { label: "Ocean", value: 46 },
