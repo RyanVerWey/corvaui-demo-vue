@@ -48,6 +48,7 @@ const normalizePath = () => {
 
 const currentPath = ref(normalizePath());
 const mode = ref<Mode>("light");
+const mobileMenu = ref<HTMLDetailsElement | null>(null);
 const activeReport = ref("network");
 const recoveryOptions = [
   { label: "Pull rail forward", value: "rail" },
@@ -69,6 +70,10 @@ const syncRoute = () => {
 const setMode = (next: Mode) => {
   mode.value = next;
   localStorage.setItem("northline-theme", next);
+};
+
+const closeMobileMenu = () => {
+  if (mobileMenu.value) mobileMenu.value.open = false;
 };
 
 const setReport = (event: Event) => {
@@ -115,10 +120,10 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
         <CorvaButton size="sm" :variant="mode === 'dark' ? 'primary' : 'secondary'" @click="setMode('dark')">Dark</CorvaButton>
       </CorvaButtonGroup>
     </CorvaAppBar>
-    <details class="mobile-menu">
+    <details ref="mobileMenu" class="mobile-menu">
       <summary>Menu</summary>
       <nav aria-label="Mobile navigation">
-        <a v-for="route in routes" :key="route.id" :href="`#${route.path}`" :aria-current="currentPath === route.path ? 'page' : undefined">{{ route.label }}</a>
+        <a v-for="route in routes" :key="route.id" :href="`#${route.path}`" :aria-current="currentPath === route.path ? 'page' : undefined" @click="closeMobileMenu">{{ route.label }}</a>
       </nav>
     </details>
 
@@ -126,13 +131,13 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
       <template v-if="currentRoute.id === 'home'">
         <section class="hero" aria-labelledby="home-title">
           <div class="hero-copy">
-            <CorvaBadge tone="info">Freight intelligence, made legible</CorvaBadge>
+            <CorvaBadge tone="info">Deterministic preview · synthetic freight data</CorvaBadge>
             <CorvaTypography id="home-title" as="h1" variant="display">See the whole route before the first mile moves.</CorvaTypography>
             <CorvaTypography variant="body">
               Northline Atlas gives logistics teams one operating picture for ocean, rail, and over-the-road freight. Plan around disruption, protect margin, and keep customers ahead of every handoff.
             </CorvaTypography>
             <div class="hero-actions">
-              <CorvaButton @click="navigate('/dashboard')">Explore live reports</CorvaButton>
+              <CorvaButton @click="navigate('/dashboard')">Explore reports</CorvaButton>
               <CorvaButton variant="secondary" @click="navigate('/about')">Compare services</CorvaButton>
             </div>
             <div class="proof-line" aria-label="Network proof">
@@ -175,7 +180,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
             </figure>
           </div>
           <CorvaStack gap="md">
-            <CorvaBadge tone="info">Live corridor</CorvaBadge>
+            <CorvaBadge tone="info">Sample corridor</CorvaBadge>
             <CorvaTypography id="network-title" as="h2" variant="title">Oakland to Rotterdam, without the blind spots.</CorvaTypography>
             <CorvaTypography variant="body">Northline watches port congestion, intermodal capacity, customs windows, and final-mile appointments as one route, not four disconnected systems.</CorvaTypography>
             <CorvaProgress label="Route confidence" :value="91"></CorvaProgress>
@@ -229,7 +234,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
       <template v-else-if="currentRoute.id === 'data-table'">
         <header class="page-hero data-hero">
           <div>
-            <CorvaBadge tone="success">Network current at 14:32 UTC</CorvaBadge>
+            <CorvaBadge tone="success">Synthetic snapshot · 14:32 UTC</CorvaBadge>
             <CorvaTypography as="h1" variant="display">Shipment network</CorvaTypography>
             <CorvaTypography variant="body">Filter active freight by lane, owner, mode, and exception state. Every row is shaped for fast operational scanning.</CorvaTypography>
           </div>
@@ -294,7 +299,7 @@ onUnmounted(() => window.removeEventListener("hashchange", syncRoute));
           <div class="control-status" aria-label="Control room status">
             <span><strong>11 min</strong>alert lead</span>
             <span><strong>$182K</strong>exposure protected</span>
-            <CorvaBadge tone="success">Team online</CorvaBadge>
+            <CorvaBadge tone="success">Synthetic team status</CorvaBadge>
           </div>
         </header>
 
