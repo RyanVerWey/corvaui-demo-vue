@@ -1,16 +1,14 @@
 # CorvaUI Vue Demo
 
-Public Vercel showcase using generated `@corvaui/vue` wrappers, `@corvaui/tokens`, and the Ocean token family. Northline Atlas is a four-route freight intelligence site with marketing, service comparison, a shipment DataGrid, and network reports.
+Public Vercel showcase using generated `@corvaui/vue` wrappers, `@corvaui/tokens`, and the Ocean token family. Northline Atlas is a five-route freight intelligence site with marketing, service comparison, a shipment DataGrid, network reports, and an exception-control workflow.
 
 ## Routes
 
-- `/` logistics command launch surface
-- `/#/dashboard` freight command dashboard
-- `/#/work-orders` shipment intake
-- `/#/customers` partner records
+- `/#/` logistics command launch surface
+- `/#/about` service comparison
 - `/#/data-table` sortable/filterable lane and load grid
-- `/#/settings` logistics workspace settings
-- `/#/about` package proof
+- `/#/dashboard` freight network reports
+- `/#/control` exception-control workflow
 
 ## Quality Gate
 
